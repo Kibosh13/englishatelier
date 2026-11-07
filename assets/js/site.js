@@ -190,6 +190,55 @@
   }
   d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menuOpen() && (!lb || lb.hidden)) { setMenu(false); menuBtn.focus(); } });
 
+  /* ---------- анимация: появление, счётчики, параллакс, лента прогресса ---------- */
+  var bar = $('#progress-bar');
+  function progress() { if (!bar) return; var h = d.documentElement.scrollHeight - w.innerHeight; bar.style.setProperty('--p', h > 0 ? Math.min(1, w.scrollY / h).toFixed(4) : 0); }
+  w.addEventListener('scroll', function () { requestAnimationFrame(progress); }, { passive: true }); progress();
+
+  if (!reduce && 'IntersectionObserver' in w) {
+    // что проявляется при прокрутке; data-группы получают задержку «лесенкой»
+    var groups = [
+      ['.sec-head > *', 1], ['.stats .stat', 1], ['.about-text > *', 1], ['.school', 1],
+      ['.method-step', 1], ['.method-note, .inline-cta', 0], ['.track-label', 0], ['.cards .card', 1],
+      ['.wide-card .card', 0], ['.sample', 1], ['.consult-copy > *', 1], ['.lead-box', 0],
+      ['.extra-docs', 0], ['.q', 1], ['.faq-list details', 1], ['.faq-contact', 0], ['.foot-grid > *', 1], ['.legal', 0],
+      ['.doc h2, .doc p, .doc .tbl, .doc ul', 0]
+    ];
+    var seen = [];
+    groups.forEach(function (g) {
+      var parents = new Map();
+      $$(g[0]).forEach(function (el) {
+        if (seen.indexOf(el) > -1 || el.closest('.hero')) return; seen.push(el);
+        el.classList.add('rv'); if (el.matches('.consult-copy > *, .about-text > *')) el.classList.add('rv-l');
+        if (g[1]) { var p = el.parentNode, n = parents.get(p) || 0; el.style.setProperty('--i', Math.min(n, 6)); parents.set(p, n + 1); }
+      });
+    });
+    var rio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); rio.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    $$('.rv').forEach(function (el) {
+      // то, что уже на экране при загрузке, показываем сразу
+      if (el.getBoundingClientRect().top < w.innerHeight * 0.92) el.classList.add('in'); else rio.observe(el);
+    });
+
+    // счётчики цифр «5» и «7+»
+    var cio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return; cio.unobserve(e.target);
+        var node = e.target.firstChild, to = parseInt(node.nodeValue, 10), t0 = null;
+        function step(t) { if (!t0) t0 = t; var k = Math.min(1, (t - t0) / 1200); node.nodeValue = String(Math.round(to * (1 - Math.pow(1 - k, 3)))); if (k < 1) requestAnimationFrame(step); }
+        node.nodeValue = '0'; requestAnimationFrame(step);
+      });
+    }, { threshold: 0.6 });
+    $$('.stat .n').forEach(function (n) { if (n.firstChild && /^\d+$/.test((n.firstChild.nodeValue || '').trim())) cio.observe(n); });
+
+    // лёгкий параллакс фото на первом экране
+    var ph = $('.portrait'), heroEl = $('.hero');
+    if (ph && heroEl) w.addEventListener('scroll', function () {
+      requestAnimationFrame(function () { var y = w.scrollY; if (y < heroEl.offsetHeight) ph.style.setProperty('--py', Math.min(y * 0.04, 16).toFixed(1) + 'px'); });
+    }, { passive: true });
+  }
+
   /* ---------- формы заявки ---------- */
   var t0 = Date.now();
   function validContact(v) {
