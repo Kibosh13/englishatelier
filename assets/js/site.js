@@ -234,16 +234,20 @@
       fd.append('utm', sstore('ea-utm') || '');
       if (!fd.get('agree')) fd.set('agree', 'on');
       btn.disabled = true; var label = btn.innerHTML; btn.innerHTML = src === 'footer' ? '…' : 'Отправляем…';
-      fetch(form.getAttribute('action'), { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json().catch(function () { return { ok: false }; }).then(function (j) { j.status = r.status; return j; }); })
+      // Превью на GitHub Pages: PHP там не работает, показываем успешную отправку без реальной заявки
+      var demo = /\.github\.io$/.test(location.hostname);
+      (demo ? new Promise(function (res) { setTimeout(function () { res({ ok: true, demo: true }); }, 600); })
+        : fetch(form.getAttribute('action'), { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.json().catch(function () { return { ok: false }; }).then(function (j) { j.status = r.status; return j; }); }))
         .then(function (j) {
           if (!j.ok) throw j;
           goal('lead_sent'); goal('lead_sent_' + src);
+          var demoNote = j.demo ? '<p class="small" style="color:var(--err)">Демо-превью: заявка никуда не отправлена.</p>' : '';
           if (src === 'main') {
-            form.hidden = true; var done = $('#lead-done'); done.hidden = false; done.focus({ preventScroll: true });
+            form.hidden = true; var done = $('#lead-done'); if (demoNote) done.insertAdjacentHTML('beforeend', demoNote); done.hidden = false; done.focus({ preventScroll: true });
             done.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
           } else {
-            form.innerHTML = '<div class="mini-done" tabindex="-1"><span class="tick" aria-hidden="true">✓</span><span>Заявка отправлена. Анна свяжется с вами по указанному контакту.</span></div>';
+            form.innerHTML = '<div class="mini-done" tabindex="-1"><span class="tick" aria-hidden="true">✓</span><span>Заявка отправлена. Анна свяжется с вами по указанному контакту.</span></div>' + demoNote;
             $('.mini-done', form).focus({ preventScroll: true });
           }
         })
