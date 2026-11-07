@@ -90,6 +90,7 @@ def header(home=True):
 </nav>
 </div>
 {chips}
+<div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
 </header>'''
 
 def mini_form():
@@ -283,7 +284,7 @@ def index():
 <div class="wrap">
 <div class="hero-copy">
 <p class="eyebrow rise d1">Разговорный английский · переезд · путешествия</p>
-<h1 class="rise d2" id="h-hero">Английский, <em>сшитый</em> для новой жизни.</h1>
+<h1 class="rise d2" id="h-hero">Английский, <em class="stitch">сшитый<svg class="thread" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M3 9 C40 3 70 12 110 7 S180 3 217 8"/></svg></em> для новой жизни.</h1>
 <p class="lead rise d3">Индивидуальные или групповые онлайн-занятия для путешествий и переезда. Практикуем ситуации из жизни за границей: от заселения в отель до разговора с арендодателем, врачом или коллегами.</p>
 <div class="cta-row rise d4">
 <a class="btn btn-gold" href="#consult" data-goal="signup_hero">Бесплатная консультация <span class="arr" aria-hidden="true">→</span></a>
