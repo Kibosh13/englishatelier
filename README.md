@@ -37,6 +37,7 @@
 | `tariff_solo`, `tariff_voyage`, `tariff_relocation`, `tariff_circle`, `tariff_fitting` | Выбор тарифа |
 | `calendly_consult`, `calendly_menu`, `calendly_footer`, `calendly_done` | Переход в календарь Calendly |
 | `tg_faq`, `tg_footer`, `tg_footer_phone`, `tg_menu` | Переход в Telegram |
+| `track_agenda_4`, `track_agenda_8`, `track_ivy_strategy`, `track_ivy_essay`, `track_ivy_monthly`, `track_ivy_full`, `tg_tracks` | Выбор пакета в спецтреках, Telegram из блока спецтреков |
 | `docs_more`, `doc_open`, `sample_open` | Раскрытие дополнительных документов, открытие скана, открытие обложки |
 
 Имя, контакт и текст заявки в Метрику не передаются.

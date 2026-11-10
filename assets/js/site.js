@@ -120,8 +120,30 @@
   d.addEventListener('focusout', function (e) { if (e.target.matches('input,textarea,select')) { focusField = false; setTimeout(updateFloat, 50); } });
 
   /* ---------- выбор тарифа подставляет цель ---------- */
-  var goalSel = $('#goal');
-  $$('[data-pick]').forEach(function (a) { a.addEventListener('click', function () { if (goalSel) goalSel.value = a.getAttribute('data-pick'); }); });
+  var goalSel = $('#goal'), fTitle = $('#form-title'), fNote = $('#form-note'), doneText = $('#done-text');
+  var baseTitle = fTitle ? fTitle.innerHTML : '', baseDone = doneText ? doneText.textContent : '';
+  // Заголовок формы соответствует выбранной услуге: платные пакеты спецтреков не выдаём за бесплатную консультацию
+  var NOTES = {
+    'Ivy Strategy': 'Платная консультация 90 минут: разбор профиля и план поступления. Анна свяжется с вами, чтобы согласовать время и оплату.',
+    'Ivy Essay': 'Стратегия одного эссе и мотивационное письмо, до 3 раундов правок. Анна свяжется с вами, чтобы обсудить сроки и оплату.',
+    'Ivy Monthly': '4 сессии в месяц и редактура документов между встречами. Анна свяжется с вами, чтобы согласовать расписание и оплату.',
+    'Ivy Full': 'Сопровождение подачи в 3 вуза, возможна рассрочка. Анна свяжется с вами, чтобы обсудить вузы, сроки и стоимость.',
+    'Agenda 4': '4 индивидуальных занятия в месяц по международным отношениям. Анна свяжется с вами, чтобы согласовать расписание и оплату.',
+    'Agenda 8': '8 индивидуальных занятий в месяц по международным отношениям. Анна свяжется с вами, чтобы согласовать расписание и оплату.'
+  };
+  function syncForm() {
+    if (!goalSel || !fTitle) return;
+    var v = goalSel.value, m = v.match(/^(Agenda \d|Ivy \w+)\s—\s(.+)$/);
+    if (m) {
+      fTitle.innerHTML = 'Заявка: <em>' + m[1] + '</em> <span class="ft-price">' + m[2] + '</span>';
+      fNote.textContent = NOTES[m[1]] || ''; fNote.hidden = false;
+      if (doneText) doneText.textContent = 'Спасибо! Анна свяжется с вами по указанному контакту, чтобы обсудить ' + m[1] + ' и договориться о деталях.';
+    } else {
+      fTitle.innerHTML = baseTitle; fNote.hidden = true; if (doneText) doneText.textContent = baseDone;
+    }
+  }
+  if (goalSel) goalSel.addEventListener('change', syncForm);
+  $$('[data-pick]').forEach(function (a) { a.addEventListener('click', function () { if (goalSel) { goalSel.value = a.getAttribute('data-pick'); syncForm(); } }); });
 
   /* ---------- дополнительные документы ---------- */
   var tg = $('#extra-toggle'), panel = $('#extra-panel');
@@ -200,7 +222,7 @@
     var groups = [
       ['.sec-head > *', 1], ['.stats .stat', 1], ['.about-text > *', 1], ['.school', 1],
       ['.method-step', 1], ['.method-note, .inline-cta', 0], ['.track-label', 0], ['.cards .card', 1],
-      ['.wide-card .card', 0], ['.sample', 1], ['.consult-copy > *', 1], ['.lead-box', 0],
+      ['.wide-card .card', 0], ['.tr', 1], ['.pk', 1], ['.ivy', 1], ['.path li', 1], ['.tr-foot', 0], ['.sample', 1], ['.consult-copy > *', 1], ['.lead-box', 0],
       ['.extra-docs', 0], ['.q', 1], ['.faq-list details', 1], ['.faq-contact', 0], ['.foot-grid > *', 1], ['.legal', 0],
       ['.doc h2, .doc p, .doc .tbl, .doc ul', 0]
     ];
