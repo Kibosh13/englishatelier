@@ -31,9 +31,9 @@ SEAL = '''<svg width="0" height="0" style="position:absolute" aria-hidden="true"
 <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 12h15M13 6l6 6-6 6"/></symbol>
 </svg>'''
 
-SECTIONS = [("teacher", "О преподавателе"), ("method", "Методика"), ("programs", "Программы"),
+SECTIONS = [("teacher", "О преподавателе"), ("method", "Методика"), ("programs", "Программы"), ("tracks", "Спецтреки"),
             ("samples", "Материалы"), ("docs", "Достижения"), ("faq", "Вопросы и ответы")]
-CHIPS = [("teacher", "Обо мне"), ("method", "Методика"), ("programs", "Программы и цены"), ("samples", "Материалы"),
+CHIPS = [("teacher", "Обо мне"), ("method", "Методика"), ("programs", "Программы и цены"), ("tracks", "Спецтреки"), ("samples", "Материалы"),
          ("consult", "Запись"), ("docs", "Достижения"), ("reviews", "Отзывы"), ("faq", "Вопросы")]
 
 def head(title, desc, path, extra="", noindex=False, og=True):
@@ -193,6 +193,14 @@ SAMPLES = [("video-73-questions", "Видеоурок · B2", "73 Questions with
 
 GOALS = ["Переезд в другую страну", "Путешествия и отпуск", "Общение и small talk", "Разовое занятие",
          "Самостоятельно с поддержкой — Solo", "Лист ожидания — Circle", "Другое"]
+# Спецтреки: (название, условия, цена для показа, цель в форме)
+AGENDA = [("Agenda 4", "4 индивидуальных занятия", "15 000", "₽ / мес.", "Agenda 4 — 15 000 ₽/мес."),
+          ("Agenda 8", "8 индивидуальных занятий", "28 000", "₽ / мес.", "Agenda 8 — 28 000 ₽/мес.")]
+IVY = [("Ivy Strategy", "Консультация 90 минут: разбор профиля и план поступления.", "", "5 900", "₽", "Ivy Strategy — 5 900 ₽", "Выбрать Strategy"),
+       ("Ivy Essay", "Стратегия одного эссе и мотивационное письмо. До 3 раундов правок, шаблоны предоставляются.", "", "9 900", "₽", "Ivy Essay — 9 900 ₽", "Выбрать Essay"),
+       ("Ivy Monthly", "4 сессии и редактура документов между встречами.", "", "19 900", "₽ / мес.", "Ivy Monthly — 19 900 ₽/мес.", "Выбрать Monthly"),
+       ("Ivy Full", "Сопровождение подачи в 3 вуза. Возможна рассрочка.", "от ", "70 000", "₽", "Ivy Full — от 70 000 ₽", "Обсудить сопровождение")]
+TRACK_GOALS = [a[4] for a in AGENDA] + [i[5] for i in IVY]
 
 FAQ = [
  ("Какой формат выбрать?", "Voyage и Relocation — занятия один на один. Solo — самостоятельная работа с проверкой заданий. Circle — разговорная практика в мини-группе. На консультации поможем выбрать формат."),
@@ -259,7 +267,12 @@ def index():
     docs_main = "".join(mat(s, a, i, "docs") for i,(s,a) in enumerate(DOCS_MAIN))
     docs_extra = "".join(mat(s, a, i+len(DOCS_MAIN), "docs") for i,(s,a) in enumerate(DOCS_EXTRA))
     faq_html = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q,a in FAQ)
-    opts = "".join(f"<option>{g}</option>" for g in GOALS)
+    opts = "".join(f"<option>{g}</option>" for g in GOALS) + '<optgroup label="Спецтреки">' + "".join(f"<option>{g}</option>" for g in TRACK_GOALS) + "</optgroup>"
+    def slug(n): return n.lower().replace(" ", "_")
+    agenda_pk = "".join(f'''<div class="pk{' pk-feat' if i==0 else ''}"><p class="pk-name">{n}</p><p class="pk-cond">{c}</p><p class="pk-price"><b>{pr}</b><span>{u}</span></p>
+<a class="btn {'btn-gold' if i==0 else 'btn-line'}" href="#consult" data-pick="{g}" data-goal="track_{slug(n)}">Выбрать {n} <span class="arr" aria-hidden="true">→</span></a></div>''' for i,(n,c,pr,u,g) in enumerate(AGENDA))
+    ivy_rows = "".join(f'''<li class="ivy"><div class="ivy-top"><h4>{n}</h4><p class="ivy-price">{('<small>'+fr+'</small>') if fr else ''}<b>{pr}</b><span>{u}</span></p></div>
+<p>{c}</p><a class="link-gold" href="#consult" data-pick="{g}" data-goal="track_{slug(n)}">{lab} <span aria-hidden="true">→</span></a></li>''' for n,c,fr,pr,u,g,lab in IVY)
 
     ld = {"@context":"https://schema.org","@graph":[
       {"@type":"Person","@id":SITE+"/#anna","name":"Анна Осокина","jobTitle":"Преподаватель английского языка, основатель English Atelier",
@@ -378,6 +391,45 @@ def index():
 </div>
 </section>
 
+<section class="spec" id="tracks" aria-labelledby="h-special">
+<div class="wrap">
+<div class="sec-head">
+<p class="eyebrow">Два новых направления</p>
+<h2 id="h-special">Международная карьера. <em>Следующий шаг.</em></h2>
+<p class="lead">Профессиональный английский для международных отношений и сопровождение поступления в университеты США.</p>
+</div>
+<div class="tr-grid">
+<article class="tr" aria-labelledby="h-agenda">
+<p class="tr-no">01 / Международные отношения</p>
+<h3 id="h-agenda">Agenda<em>.</em></h3>
+<p class="tr-sub">Английский для международных отношений</p>
+<p class="tr-intro">Для тех, кто хочет погрузиться в международные отношения и уверенно говорить о них на английском.</p>
+<div class="tr-part"><p class="tr-lbl">На занятиях</p>
+<p>Изучаем профессиональную лексику, разбираем The Economist и Foreign Affairs, работаем с policy briefs — учимся анализировать международные события, обсуждать идеи и аргументировать свою позицию.</p>
+<ul class="tags" aria-label="Материалы занятий"><li>The Economist</li><li>Foreign Affairs</li><li>Policy briefs</li></ul></div>
+<div class="tr-part"><p class="tr-lbl">Пакеты</p><div class="pks">{agenda_pk}</div></div>
+<div class="tr-part"><p class="tr-lbl">Мой академический путь</p>
+<p class="tr-quote">Я преподаю не только язык, но и предмет: знаю, как пишут, спорят и ведут переговоры в международной среде.</p>
+<ul class="path">
+<li><span>2025</span><p>London School of Economics<small>BSc Politics and International Relations</small></p></li>
+<li><span>2025</span><p>НИУ ВШЭ<small>Бакалавриат «Международные отношения и глобальные исследования»</small></p></li>
+<li><span>2028</span><p>Columbia University · SIPA<small>Master of International Affairs · обучение, выпуск в 2028 году</small></p></li>
+</ul></div>
+</article>
+<article class="tr" aria-labelledby="h-ivy">
+<p class="tr-no">02 / Образование в США</p>
+<h3 id="h-ivy">The Ivy League</h3>
+<p class="tr-sub">Поступление в университеты США</p>
+<p class="tr-intro">Я сама прошла этот путь, поступив в четыре американских вуза, включая Columbia University in the City of New York.</p>
+<div class="tr-part"><p class="tr-lbl">Над чем работаем</p>
+<p>Выберем программы, выстроим стратегию, напишем сильные эссе и мотивационные письма, оформим CV и подготовимся к интервью.</p></div>
+<div class="tr-part"><p class="tr-lbl">Пакеты</p><ul class="ivys">{ivy_rows}</ul></div>
+</article>
+</div>
+<div class="tr-foot"><p>Не знаете, какой трек выбрать? <a class="link-gold" data-goal="tg_tracks" href="{TG_URL}" target="_blank" rel="noopener noreferrer">Напишите Анне в Telegram<span aria-hidden="true"> ↗</span></a></p><a class="plain" data-goal="tg_tracks_phone" href="{TG_URL}" target="_blank" rel="noopener noreferrer">{TG_LABEL}</a></div>
+</div>
+</section>
+
 <section class="samples" id="samples" aria-labelledby="h-samples">
 <div class="wrap">
 <div class="sec-head">
@@ -403,7 +455,8 @@ def index():
 </div>
 <div class="lead-box">
 <form class="panel lead-form" id="lead" data-source="main" action="/api/lead.php" method="post" novalidate>
-<h3>Запишитесь на <em>бесплатную консультацию.</em></h3>
+<h3 id="form-title">Запишитесь на <em>бесплатную консультацию.</em></h3>
+<p class="form-note" id="form-note" hidden></p>
 <div class="field" id="f-name">
 <label for="name">Ваше имя</label>
 <input id="name" name="name" type="text" autocomplete="given-name" placeholder="Как к вам обращаться" required maxlength="80" aria-describedby="name-err">
@@ -432,7 +485,7 @@ def index():
 <div class="panel done" id="lead-done" hidden tabindex="-1">
 <span class="tick" aria-hidden="true">✓</span>
 <h3>Заявка <em>отправлена.</em></h3>
-<p>Спасибо! Анна свяжется с вами по указанному контакту, чтобы договориться о времени консультации.</p>
+<p id="done-text">Спасибо! Анна свяжется с вами по указанному контакту, чтобы договориться о времени консультации.</p>
 <p class="small">Не хотите ждать? <a class="link-gold" data-goal="calendly_done" href="{CAL_URL}" target="_blank" rel="noopener noreferrer">Выберите время в календаре</a> сами.</p>
 </div>
 </div>

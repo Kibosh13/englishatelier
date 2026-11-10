@@ -37,7 +37,9 @@ $elapsed = (int)($_POST['t'] ?? 0);
 if ($s('website', 200) !== '' || $elapsed < 2) out(200, ['ok' => true]);
 
 $goals = ['Переезд в другую страну', 'Путешествия и отпуск', 'Общение и small talk', 'Разовое занятие',
-          'Самостоятельно с поддержкой — Solo', 'Лист ожидания — Circle', 'Другое'];
+          'Самостоятельно с поддержкой — Solo', 'Лист ожидания — Circle', 'Другое',
+          'Agenda 4 — 15 000 ₽/мес.', 'Agenda 8 — 28 000 ₽/мес.', 'Ivy Strategy — 5 900 ₽', 'Ivy Essay — 9 900 ₽',
+          'Ivy Monthly — 19 900 ₽/мес.', 'Ivy Full — от 70 000 ₽'];
 if ($goal !== '' && !in_array($goal, $goals, true)) $goal = 'Другое';
 
 $digits = preg_replace('/\D/', '', $contact);
@@ -65,7 +67,7 @@ $lines = [
   '',
   'Имя: ' . ($name !== '' ? $h($name) : '—'),
   'Контакт: ' . ($tgLink ? '<a href="' . $h($tgLink) . '">' . $h($contact) . '</a>' : $h($contact)),
-  'Цель: ' . ($goal !== '' ? $h($goal) : '—'),
+  (preg_match('/^(Agenda|Ivy)/u', $goal) ? '<b>Услуга: ' . $h($goal) . '</b>' : 'Цель: ' . ($goal !== '' ? $h($goal) : '—')),
 ];
 if ($comment !== '') $lines[] = 'Комментарий: ' . $h($comment);
 $lines[] = 'Рассылка: ' . ($news ? 'согласие дано' : 'нет');
