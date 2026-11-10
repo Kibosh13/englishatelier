@@ -91,7 +91,8 @@ def build(OUT, head, header, footer, tail, rel):
     css_mark = '<style>mark.todo{background:rgba(224,139,124,.18);color:#f0b3a7;padding:1px 4px;border-radius:3px}</style>'
     t, b = render("privacy.raw", privacy_tables())
     docs = [("privacy", "Политика конфиденциальности — English Atelier", "Как English Atelier обрабатывает и защищает персональные данные.", b, "Политика конфиденциальности")]
-    t, b = render("oferta.raw", oferta_tables())
+    import oferta3
+    b = oferta3.body()  # редакция от 10.11.2026, версия 3
     docs.append(("oferta", "Договор-оферта — English Atelier", "Условия оказания услуг по обучению английскому языку English Atelier.", b, "Договор-оферта"))
     t, b = render("consent.raw", [], stop="Текст для сайта", anchors={"Согласие на получение рассылки": "news"})
     b = b.replace("<h2>Согласие на обработку персональных данных</h2>", "", 1)
